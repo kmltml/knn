@@ -2,6 +2,8 @@ package knn
 
 import java.io.File
 import scopt.OParser
+import kantan.csv._
+import kantan.csv.ops._
 
 object Main {
 
@@ -10,7 +12,9 @@ object Main {
       queryFile: Option[File] = None,
       outFile: Option[File] = None,
       inputColumns: Option[Seq[Int]] = None,
-      outputColumns: Option[Seq[Int]] = None
+      outputColumns: Option[Seq[Int]] = None,
+      separator: Char = ',',
+      k: Int = 3
   )
 
   val OptionParser = {
@@ -39,13 +43,53 @@ object Main {
         .text("Column indices of known data in the model"),
       opt[Seq[Int]]('u', "unknown-cols")
         .action((s, o) => o.copy(outputColumns = Some(s)))
-        .text("Column indices of unknown data in the model")
+        .text("Column indices of unknown data in the model"),
+      opt[Char]('s', "separator")
+        .action((c, o) => o.copy(separator = c))
+        .text("Separator used in csv files (default is ',')"),
+      opt[Char]('k', "neighbour-count")
+        .action((k, o) => o.copy(k = k))
+        .text(
+          "The parameter determining how many neighbours are considered during prediction (default: 3)"
+        )
     )
   }
 
   def main(args: Array[String]): Unit = {
     OParser.parse(OptionParser, args, Options()).foreach { options =>
-      println(options)
+      val model = ReadResult
+        .sequence(
+          options.modelFile.get
+            .asCsvReader[Vector[Double]](options.separator, false)
+            .toVector
+        )
+        .fold(err => sys.error(err.toString), identity)
+      val query = ReadResult
+        .sequence(
+          options.queryFile.get
+            .asCsvReader[Vector[Double]](options.separator, false)
+            .toVector
+        )
+        .fold(err => sys.error(err.toString), identity)
+      val (known, unknown) =
+        (options.inputColumns, options.outputColumns) match {
+          case (Some(i), Some(o)) => (i.toVector, o.toVector)
+          case (Some(i), None) =>
+            (i.toVector, model.head.indices.toVector diff i)
+          case (None, Some(o)) =>
+            (model.head.indices.toVector diff o, o.toVector)
+          case (None, None) =>
+            (model.head.indices.init.toVector, Vector(model.head.indices.last))
+        }
+      val euler: Metric =
+        (a, b) =>
+          math.sqrt((a zip b).map { case (x, y) => (x - y) * (x - y) }.sum)
+
+      val result =
+        Prediction.predictAll(model, known, unknown, query, euler, options.k)
+
+      options.outFile.get.writeCsv[Vector[Double]](result, options.separator)
+
     }
   }
 
