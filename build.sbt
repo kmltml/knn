@@ -5,5 +5,9 @@ ThisBuild / organizationName := "example"
 
 lazy val root = (project in file("."))
   .settings(
-    name := "knn"
+    name := "knn",
+    libraryDependencies ++= Seq(
+      "com.github.scopt" %% "scopt" % "4.0.0-RC2",
+      "com.nrinaudo" %% "kantan.csv" % "0.4.0"
+    )
   )
