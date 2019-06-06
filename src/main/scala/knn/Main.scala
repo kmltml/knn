@@ -14,7 +14,9 @@ object Main {
       inputColumns: Option[Seq[Int]] = None,
       outputColumns: Option[Seq[Int]] = None,
       separator: Char = ',',
-      k: Int = 3
+      normalize: Boolean = false,
+      k: KScheme = KScheme.Sqrt,
+      weights: Weighting = Weighting.Const
   )
 
   val OptionParser = {
@@ -47,11 +49,17 @@ object Main {
       opt[Char]('s', "separator")
         .action((c, o) => o.copy(separator = c))
         .text("Separator used in csv files (default is ',')"),
-      opt[Char]('k', "neighbour-count")
+      opt[Unit]('n', "normalize")
+        .action((c, o) => o.copy(normalize = true))
+        .text("Normalize input data"),
+      opt[KScheme]('k', "neighbour-count")
         .action((k, o) => o.copy(k = k))
         .text(
-          "The parameter determining how many neighbours are considered during prediction (default: 3)"
-        )
+          "The parameter determining how many neighbours are considered during prediction (default: sqrt(n))"
+        ),
+      opt[Weighting]('w', "weighting")
+        .action((w, o) => o.copy(weights = w))
+        .text("How neighbour weights are determined")
     )
   }
 
