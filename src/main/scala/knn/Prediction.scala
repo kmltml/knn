@@ -26,9 +26,14 @@ object Prediction {
       unknownColumns: Vector[Int],
       input: Vector[Vector[Double]],
       metric: Metric,
-      k: Int
+      k: KScheme
   ): Vector[Vector[Double]] = {
-    input.map(predict(model, knownColums, unknownColumns, _, metric, k))
+    val kv = k match {
+      case KScheme.Everything => model.size
+      case KScheme.Sqrt => math.sqrt(model.size).toInt
+      case KScheme.Value(k) => k
+    }
+    input.map(predict(model, knownColums, unknownColumns, _, metric, kv))
   }
 
 }
