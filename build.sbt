@@ -8,6 +8,8 @@ lazy val root = (project in file("."))
     name := "knn",
     libraryDependencies ++= Seq(
       "com.github.scopt" %% "scopt" % "4.0.0-RC2",
-      "com.nrinaudo" %% "kantan.csv" % "0.4.0"
+      "com.nrinaudo" %% "kantan.csv" % "0.4.0",
+      "org.apache.spark" %% "spark-core" % "2.4.3",
+      "org.apache.spark" %% "spark-mllib" % "2.4.3"
     )
   )
