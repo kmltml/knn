@@ -13,7 +13,8 @@ object Weighting {
       case "const" => Const
       case "inv" => Inv
       case "log" => Log
-      case n => throw new IllegalArgumentException(s"$n is not a valid weighting")
+      case n =>
+        throw new IllegalArgumentException(s"$n is not a valid weighting")
     }
 
 }
