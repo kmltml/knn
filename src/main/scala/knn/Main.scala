@@ -115,7 +115,8 @@ object Main {
               unknown,
               query,
               options.metric,
-              options.k
+              options.k,
+              options.weights
             )
 
           options.outFile.get
@@ -138,14 +139,15 @@ object Main {
               unknown,
               input,
               options.metric,
-              options.k
+              options.k,
+              options.weights
             )
             val squareErrors = (expected zip res).map {
               case (e, r) =>
                 (e zip r).map { case (a, b) => (a - b) * (a - b) }.sum
             }
             val hitCount = (expected zip res).count {
-              case (e, r) => e == r
+              case (e, r) => e.map(_.toInt) == r.map(_.toInt)
             }
             (squareErrors, hitCount)
           }
