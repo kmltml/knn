@@ -1,0 +1,12 @@
+dataset,metric,mse,hit
+winequality-red,hassanat,0.5005071124028057,46.97
+winequality-red,euclidean,0.5747294289300195,43.28
+
+winequality-white,hassanat,0.5880385423809166,44.96
+winequality-white,euclidean,0.6836075226915612,43.14
+
+abalone,hassanat,5.891406446734999,25.04
+abalone,euclidean,5.976166651865122,25.19
+
+breast-cancer-wisconsin,hassanat,0.14880636521253437,63.54
+breast-cancer-wisconsin,euclidean,0.956863081734731,61.49
